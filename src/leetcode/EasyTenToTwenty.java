@@ -5,51 +5,98 @@ import java.util.stream.Collectors;
 
 public class EasyTenToTwenty {
 
-    //    https://leetcode.com/problems/find-k-pairs-with-smallest-sums/
-    public static List<List<Integer>> kSmallestPairs(int[] nums1, int[] nums2, int k) {
+    public static List<List<Integer>> kSmallestPairsTRAGEDIE(int[] nums1, int[] nums2, int k) {
         List<List<Integer>> result = new ArrayList<>();
+
+        // Edge case
         if (nums1.length == 0 || nums2.length == 0 || k <= 0) {
             return result;
         }
+
+        // Ensure nums1 is always the longer (or equal) array
         if (nums1.length < nums2.length) {
             int[] temp = nums1;
             nums1 = nums2;
             nums2 = temp;
         }
-        int i = 0;
-        int j = 0;
-        int savedIndexI = 0;
-        int savedIndexJ = 0;
-        boolean loopedAll = false;
-        int nextMinBorder = Integer.MAX_VALUE;
+
+        int i = 0, j = 0;
+        int savedIndexI = 0, savedIndexJ = 0;
+
         while (k > 0) {
             List<Integer> pair = new ArrayList<>();
             pair.add(nums1[i]);
             pair.add(nums2[j]);
             result.add(pair);
             k--;
-            boolean incrementi = false;
-            boolean incrementj = false;
-            if (nums1[i] + nums2[j + 1] < nums1[i + 1] + nums2[j]) {
-                incrementj = true;
-            } else incrementi = true;
-            if (incrementi && j != nums2.length - 1) {
-                savedIndexI = i;
-                savedIndexJ = j;
-                nextMinBorder = nums1[i] + nums2[j + 1];
-            }
-            if (nextMinBorder < nums1[i + 1] + nums2[j]) {
-                incrementi = false;
-                incrementj = true;
-                i = savedIndexI;
-                j = savedIndexJ;
+            boolean incrementI = false, incrementJ = false;
+
+            if (j + 1 < nums2.length && i + 1 < nums1.length) {
+                if (nums1[i] + nums2[j + 1] <= nums1[i + 1] + nums2[j]) {
+                    incrementJ = true;
+                } else {
+                    incrementI = true;
+                }
+            } else if (j + 1 < nums2.length) {
+                incrementJ = true;
+            } else if (i + 1 < nums1.length) {
+                incrementI = true;
             }
 
-            if (j == nums2.length - 1) {
-                loopedAll = true;
+            // Increment i or j as decided
+            if (incrementI) {
+                // Save the current j before incrementing i
+                savedIndexI = i;
+                savedIndexJ = j;
+                i++; // Increment i
+            } else if (incrementJ) {
+                j++; // Increment j
+            }
+
+            // Handle backtracking logic: When j is exhausted, revert to saved indices
+            if (j >= nums2.length - 1 && incrementI) {
+                i = savedIndexI;
+                j = savedIndexJ + 1;
+            }
+
+            // If both indices are exhausted, stop
+            if (i >= nums1.length || j >= nums2.length) {
+                break;
             }
         }
+
         return result;
+    }
+
+    //    https://leetcode.com/problems/find-k-pairs-with-smallest-sums/
+    public static List<List<Integer>> kSmallestPairs(int[] nums1, int[] nums2, int k) {
+        List<List<Integer>> ans = new ArrayList<>(k);
+        int[] indexes = new int[nums1.length];
+        while (k-- > 0) {
+            int minSum = Integer.MAX_VALUE;
+            int nums1Id = -1;
+            int nums2Id = -1;
+            for (int i = 0; i < nums1.length; i++) {
+                if (indexes[i] == nums2.length) {
+                    continue;
+                }
+                int sum = nums1[i] + nums2[indexes[i]];
+                if (sum < minSum) {
+                    minSum = sum;
+                    nums1Id = i;
+                    nums2Id = indexes[i];
+                }
+                if (indexes[i] == 0) {
+                    break;
+                }
+            }
+            if (nums1Id < 0) {
+                break;
+            }
+            ans.add(Arrays.asList(nums1[nums1Id], nums2[nums2Id]));
+            indexes[nums1Id]++;
+        }
+        return ans;
     }
 
     // 1 https://leetcode.com/problems/excel-sheet-column-number/

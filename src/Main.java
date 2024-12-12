@@ -4,13 +4,13 @@ public class Main {
     public static void main(String[] args) {
         int[] nums1 = {1, 1, 2};
         int[] nums2 = {1, 2, 3};
-        int k = 2;
+        int k = 4;
         System.out.println(kSmallestPairs(nums1, nums2, k)); // [[1,1],[1,1]]
 
         // Example 2
         nums1 = new int[]{1, 2, 4, 5, 6};
         nums2 = new int[]{3, 5, 7, 9};
-        k = 3;
+        k = 6;
 
         System.out.println(kSmallestPairs(nums2, nums1, k)); // [[1,3],[2,3],[1,5]]
 
