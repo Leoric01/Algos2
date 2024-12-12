@@ -4,7 +4,112 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class EasyTenToTwenty {
+    //    https://leetcode.com/problems/decode-string/
+    // TODO THIS WAS GOOD ONE
+    public static String decodeString(String s) {
+        while (s.contains("]")) {
+            int bracketClose = s.indexOf(']');
+            int bracketOpen = bracketClose;
+            while (s.charAt(bracketOpen) != '[') {
+                bracketOpen--;
+            }
 
+            int digitStartIndex = bracketOpen - 1;
+            for (int i = digitStartIndex; i > 0; i--) {
+                if (Character.isDigit(s.charAt(digitStartIndex - 1))) {
+                    digitStartIndex--;
+                } else {
+                    break;
+                }
+            }
+
+            int repeats = Integer.parseInt(s.substring(digitStartIndex, bracketOpen));
+            String insideBracket = s.substring(bracketOpen + 1, bracketClose);
+            String repeatedInsides = insideBracket.repeat(repeats);
+            s = s.substring(0, digitStartIndex) + repeatedInsides + s.substring(bracketClose + 1);
+        }
+        return s;
+    }
+
+    //    https://leetcode.com/problems/nth-digit/
+    public static int findNthDigit(int n) {
+        if (n < 10) {
+            return n;
+        }
+        int digitLength = 1;
+        long count = 9;
+        long start = 1;
+
+        while (n > digitLength * count) {
+            n -= (int) (digitLength * count);
+            digitLength++;
+            count *= 10;
+            start *= 10;
+        }
+        long targetNumber = start + (n - 1) / digitLength;
+        int digitIndex = (n - 1) % digitLength;
+        return String.valueOf(targetNumber).charAt(digitIndex) - '0';
+    }
+
+    //    https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/
+    public static int kthSmallest(int[][] matrix, int k) {
+        int n = matrix.length;
+        int rows = (k - 1) / n;
+        int cols = (k - 1) % n;
+        return matrix[rows][cols];
+    }
+
+    //    https://leetcode.com/problems/add-strings/
+    public static String addStrings(String num1, String num2) {
+        int longerSize = Math.max(num1.length(), num2.length());
+        int indexEnd = 0;
+        int carry = 0;
+        StringBuilder result = new StringBuilder();
+        while (indexEnd < longerSize) {
+            int digitSum = 0;
+            int digit1 = (indexEnd < num1.length()) ? Character.getNumericValue(num1.charAt(num1.length() - indexEnd - 1)) : 0;
+            int digit2 = (indexEnd < num2.length()) ? Character.getNumericValue(num2.charAt(num2.length() - indexEnd - 1)) : 0;
+
+            digitSum += digit1 + digit2 + carry;
+            result.append(digitSum % 10);
+            carry = digitSum / 10;
+            indexEnd++;
+        }
+        if (carry > 0) {
+            result.append(carry);
+        }
+        return result.reverse().toString();
+    }
+
+    public static List<List<Integer>> kSmallestProductsMultiplication(int[] nums1, int[] nums2, int k) {
+        List<List<Integer>> result = new ArrayList<>();
+        int[] indexes = new int[nums1.length]; // Tracks how many pairs from nums2 for each nums1[i]
+        while (k-- > 0) {
+            int minProduct = Integer.MAX_VALUE;
+            int nums1Id = -1, nums2Id = -1;
+            for (int i = 0; i < nums1.length; i++) {
+                if (indexes[i] == nums2.length) {
+                    continue;
+                }
+                int product = nums1[i] * nums2[indexes[i]];
+                System.out.println("product = " + product + " index = " + i + " nums1[" + i + "] = " + nums1[i] +
+                                   " nums2[indexes[" + i + "] = " + nums2[indexes[i]]);
+                if (product < minProduct) {
+                    minProduct = product;
+                    nums1Id = i;
+                    nums2Id = indexes[i];
+                }
+            }
+            if (nums1Id < 0) {
+                break;
+            }
+            result.add(Arrays.asList(nums1[nums1Id], nums2[nums2Id]));
+            indexes[nums1Id]++;
+        }
+        return result;
+    }
+
+    //    https://leetcode.com/problems/find-k-pairs-with-smallest-sums/
     public static List<List<Integer>> kSmallestPairsTRAGEDIE(int[] nums1, int[] nums2, int k) {
         List<List<Integer>> result = new ArrayList<>();
 
@@ -70,7 +175,7 @@ public class EasyTenToTwenty {
 
     //    https://leetcode.com/problems/find-k-pairs-with-smallest-sums/
     public static List<List<Integer>> kSmallestPairs(int[] nums1, int[] nums2, int k) {
-        List<List<Integer>> ans = new ArrayList<>(k);
+        List<List<Integer>> ans = new ArrayList<>();
         int[] indexes = new int[nums1.length];
         while (k-- > 0) {
             int minSum = Integer.MAX_VALUE;
